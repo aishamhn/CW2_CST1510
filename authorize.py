@@ -20,28 +20,69 @@ def verify_password(plain_text_password, hashed_password):
 
 def register_user(username, password):
     # TODO: Check if the username already exists
+    if user_exists(username):
+        print("Error: Username already exists. Please choose another.")
+        return False
     # TODO: Hash the password
+    hashed_pw = hash_password(password)
     # TODO: Append the new user to the file
+    with open(USER_DATA_FILE, "a") as f:
+        f.write(f'{username}, {hashed_pw}\n')
     # Format: username,hashed_password
+    print("Registration successful!")
     return True
 
 def user_exists(username):
     # TODO: Handle the case where the file doesn't exist yet
+    if not os.path.exists(USER_DATA_FILE):
+        return False
     # TODO: Read the file and check each line for the username
+    with open(USER_DATA_FILE, 'r') as f:
+        for line in f:
+            stored_username, _ = line.strip().split(",", 1)
+            if stored_username == username:
+                return True
     return False
 
 def login_user(username, password):
     # TODO: Handle the case where no users are registered yet
+    if not os.path.exists(USER_DATA_FILE):
+        print("Error: No users registered yet.")
+        return False
     # TODO: Search for the username in the file
-    # TODO: If username matches, verify the password
-    # TODO: If we reach here, the username was not found
-    return 
+    with open(USER_DATA_FILE, 'r') as f:
+        for line in f:
+            stored_username, stored_hash = line.strip().split(',',1)
+            # TODO: If username matches, verify the password
+            if stored_username == username:
+                if verify_password(password, stored_hash):
+                    print(f"Welcome back, {username}")
+                    return True
+                # TODO: If we reach here, the username was not found
+                else:
+                    print("Incorrect password")
+                    return False
+                
+    print("Username not found")
+    return False
 
 def validate_username(username):
-    pass
+    # Ensure username meets basic criteria
+    if not username:
+        return False, "Username can't be empty"
+    if len(username) < 3:
+        return False, "Username must be atleast 3 letters"
+    if " " in username:
+        return False, "username cannot contain spaces"
+    return True, ""
 
 def validate_password(password):
-    pass
+    #Ensure password meets basic security criteria
+    if len(password) < 8:
+        return False, "Password must be atleast 8 characters"
+    if password.isalpha() or password.isdigit():
+        return False, "Password must contain both letters and numbers" 
+    return True, ""
 
 def display_menu():
     """Displays the main menu options."""
