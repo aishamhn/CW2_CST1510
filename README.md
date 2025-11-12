@@ -1,6 +1,6 @@
 # Week 7: Secure Authentication System
-Student Name: [Your Name]
-Student ID: [Your Student_ID]
+Student Name: Aisha Mahmood nyako
+Student ID: M01027193
 Course: CST1510 -CW2 - Multi-Domain Intelligence Platform
 ## Project Description
 A command-line authentication system implementing secure password hashing
@@ -16,4 +16,4 @@ This system allows users to register accounts and log in with proper pass
 - Data Storage: Plain text file (`
 users.txt`) with comma-separated values
 - Password Security: One-way hashing, no plaintext storage
-- Validation: Username (3-20 alphanumeric characters), Password (6-50 cha
+- Validation: Username (3-20 alphanumeric characters), Password (6-50 characters)
