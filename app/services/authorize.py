@@ -1,6 +1,6 @@
 import bcrypt
 import os
-USER_DATA_FILE = "users.txt"
+USER_DATA_FILE = "DATA/users.txt"
 
 def hash_password(plain_text_password):
     # Encode the password to bytes, required by bcrypt
@@ -9,7 +9,7 @@ def hash_password(plain_text_password):
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password_bytes, salt)
         # Decode the hash back to a string to store in a text file
-    return hashed_password
+    return hashed_password.decode('utf-8')
 
 def verify_password(plain_text_password, hashed_password):
     # Encode both the plaintext password and stored hash to bytes
@@ -27,7 +27,7 @@ def register_user(username, password):
     hashed_pw = hash_password(password)
     # TODO: Append the new user to the file
     with open(USER_DATA_FILE, "a") as f:
-        f.write(f'{username}, {hashed_pw}\n')
+        f.write(f'{username},{hashed_pw}\n')
     # Format: username,hashed_password
     print("Registration successful!")
     return True
