@@ -1,270 +1,72 @@
-import sqlite3
 import bcrypt
-import os
-from pathlib import Path
-from app.data.db import connect_database
 from app.data.users import get_user_by_username, insert_user
-from app.data.schema import create_users_table
+from app.data.db import connect_database, DATA_DIR
+from pathlib import Path
 
-USER_DATA_FILE = "DATA/users.txt"
+USERS_FILE_PATH = DATA_DIR / "users.txt" 
 
-
-def hash_password(plain_text_password):
-    # Encode the password to bytes, required by bcrypt
-    password_bytes = plain_text_password.encode('utf-8')
-    # Generate a salt and hash the password
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password_bytes, salt)
-        # Decode the hash back to a string to store in a text file
-    return hashed_password.decode('utf-8')
-
-
-def verify_password(plain_text_password, hashed_password):
-    # Encode both the plaintext password and stored hash to bytes
-    password_bytes = plain_text_password.encode('utf-8')
-    hashed_password_bytes = hashed_password.encode('utf-8')
-    # bcrypt.checkpw handles extracting the salt and comparing
-    return bcrypt.checkpw(password_bytes, hashed_password_bytes)
-
-
-def register_user(username, password, role="user"):
+def register_user(conn, username, password, role):
     """
-    Register a new user in the database.
-    
-    This is a COMPLETE IMPLEMENTATION as an example.
-    
-    Args:
-        username: User's login name
-        password: Plain text password (will be hashed)
-        role: User role (default: 'user')
-        
-    Returns:
-        tuple: (success: bool, message: str)
+    Hashes the password and registers a new user if the username is not taken.
     """
-    conn = connect_database()
-    cursor = conn.cursor()
-    
-    # Check if user already exists
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if cursor.fetchone():
-        conn.close()
-        return False, f"Username '{username}' already exists."
-    
-    # Hash the password
-    password_bytes = password.encode('utf-8')
-    salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(password_bytes, salt)
-    password_hash = hashed.decode('utf-8')
-    
-    # Insert new user
-    cursor.execute(
-        "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-        (username, password_hash, role)
-    )
-    conn.commit()
-    conn.close()
-    
-    return True, f"User '{username}' registered successfully!"
-
-
-def user_exists(username):
-    # TODO: Handle the case where the file doesn't exist yet
-    if not os.path.exists(USER_DATA_FILE):
+    if get_user_by_username(conn, username):
+        print(f"Registration failed: User '{username}' already exists.")
         return False
-    # TODO: Read the file and check each line for the username
-    with open(USER_DATA_FILE, 'r') as f:
-        for line in f:
-            stored_username, _ = line.strip().split(",", 1)
-            if stored_username == username:
-                return True
-    return False
 
+    # Hash the password using bcrypt
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    
+    # Insert the user into the database
+    insert_user(conn, username, hashed_password, role)
+    print(f"User '{username}' registered successfully with role '{role}'.")
+    return True
 
-def login_user(username, password):
+def login_user(conn, username, password):
     """
-    Authenticate a user against the database.
+    Authenticates a user by checking the hashed password.
+    """
+    user_record = get_user_by_username(conn, username)
     
-    This is a COMPLETE IMPLEMENTATION as an example.
-    
-    Args:
-        username: User's login name
-        password: Plain text password to verify
+    if user_record:
+        # user_record is (username, hashed_password, role)
+        db_username, db_hashed_password, db_role = user_record
         
-    Returns:
-        tuple: (success: bool, message: str)
-    """
-    conn = connect_database()
-    cursor = conn.cursor()
-    
-    # Find user
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    user = cursor.fetchone()
-    conn.close()
-    
-    if not user:
-        return False, "Username not found."
-    
-    # Verify password (user[2] is password_hash column)
-    stored_hash = user[2]
-    password_bytes = password.encode('utf-8')
-    hash_bytes = stored_hash.encode('utf-8')
-    
-    if bcrypt.checkpw(password_bytes, hash_bytes):
-        return True, f"Welcome, {username}!"
-    else:
-        return False, "Invalid password."
-    
-
-def migrate_users_from_file(conn, filepath="Data/users.txt"):
-    """
-    Migrate users from users.txt to the database.
-    
-    This is a COMPLETE IMPLEMENTATION as an example.
-    
-    Args:
-        conn: Database connection
-        filepath: Path to users.txt file
-    """
-    if not filepath.exists():
-        print(f"⚠️  File not found: {filepath}")
-        print("   No users to migrate.")
-        return
-    
-    cursor = conn.cursor()
-    migrated_count = 0
-    
-    with open(filepath, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            
-            # Parse line: username,password_hash
-            parts = line.split(',')
-            if len(parts) >= 2:
-                username = parts[0]
-                password_hash = parts[1]
-                
-                # Insert user (ignore if already exists)
-                try:
-                    cursor.execute(
-                        "INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-                        (username, password_hash, 'user')
-                    )
-                    if cursor.rowcount > 0:
-                        migrated_count += 1
-                except sqlite3.Error as e:
-                    print(f"Error migrating user {username}: {e}")
-    
-    conn.commit()
-    print(f"✅ Migrated {migrated_count} users from {filepath.name}")
-
-    # Verify users were migrated
-    conn = connect_database()
-    cursor = conn.cursor()
-
-    # Query all users
-    cursor.execute("SELECT id, username, role FROM users")
-    users = cursor.fetchall()
-
-    print(" Users in database:")
-    print(f"{'ID':<5} {'Username':<15} {'Role':<10}")
-    print("-" * 35)
-    for user in users:
-        print(f"{user[0]:<5} {user[1]:<15} {user[2]:<10}")
-
-    print(f"\nTotal users: {len(users)}")
-    conn.close()
-
-
-def validate_username(username):
-    # Ensure username meets basic criteria
-    if not username:
-        return False, "Username can't be empty"
-    if len(username) < 3:
-        return False, "Username must be atleast 3 letters"
-    if " " in username:
-        return False, "username cannot contain spaces"
-    return True, ""
-
-
-def validate_password(password):
-    #Ensure password meets basic security criteria
-    if len(password) < 8:
-        return False, "Password must be atleast 8 characters"
-    if password.isalpha() or password.isdigit():
-        return False, "Password must contain both letters and numbers" 
-    return True, ""
-
-
-def display_menu():
-    """Displays the main menu options."""
-    print("\n" + "="*50)
-    print(" MULTI-DOMAIN INTELLIGENCE PLATFORM")
-    print(" Secure Authentication System")
-    print("="*50)
-    print("\n[1] Register a new user")
-    print("[2] Login")
-    print("[3] Exit")
-    print("-"*50)
-
-
-def main():
-    """Main program loop."""
-    print("\nWelcome to the Week 7 Authentication System!")
-    while True:
-        display_menu()
-        choice = input("\nPlease select an option (1-3): ").strip()
-
-        if choice == '1':
-            # Registration flow
-            print("\n--- USER REGISTRATION ---")
-            username = input("Enter a username: ").strip()
-
-            # Validate username
-            is_valid, error_msg = validate_username(username)
-            if not is_valid:
-                print(f"Error: {error_msg}")
-                continue
-
-            password = input("Enter a password: ").strip()
-
-            # Validate password
-            is_valid, error_msg = validate_password(password)
-            if not is_valid:
-                print(f"Error: {error_msg}")
-                continue
-
-            # Confirm password
-            password_confirm = input("Confirm password: ").strip()
-            if password != password_confirm:
-                print("Error: Passwords do not match.")
-                continue
-
-            # Register the user
-            register_user(username, password)
-
-        elif choice == '2':
-            # Login flow
-            print("\n--- USER LOGIN ---")
-            username = input("Enter your username: ").strip()
-            password = input("Enter your password: ").strip()
-
-            # Attempt login
-            if login_user(username, password):
-                print("\nYou are now logged in.")
-
-                # Optional: Ask if they want to logout or exit
-                input("\nPress Enter to return to main menu...")
-
-        elif choice == '3':
-            # Exit
-            print("\nThank you for using the authentication system.")
-            print("Exiting...")
-            break
-        
+        # Compare the provided password with the stored hash
+        if bcrypt.checkpw(password.encode('utf-8'), db_hashed_password.encode('utf-8')):
+            return db_role
         else:
-            print("\nError: Invalid option. Please select 1, 2, or 3.")
+            return None # Invalid password
+    else:
+        return None # User not found
 
-if __name__ == "__main__":
-    main()
+def migrate_users_from_file(conn, filepath=USERS_FILE_PATH):
+    """
+    Reads users from the old users.txt file and moves them to the database.
+    """
+    try:
+        if not filepath.exists():
+             print(f"Migration skipped: User file '{filepath}' not found.")
+             return 0
+
+        with open(filepath, 'r') as f:
+            lines = f.readlines()
+        
+        migrated_count = 0
+        for line in lines:
+            parts = line.strip().split(',')
+            if len(parts) == 2:
+                username, role = parts[0], parts[1]
+                # Use a common placeholder password for migrated users
+                placeholder_password = "password123" 
+                
+                # Check if user already exists before registering
+                if not get_user_by_username(conn, username):
+                    register_user(conn, username, placeholder_password, role)
+                    migrated_count += 1
+        
+        print(f"--- User Migration Complete: {migrated_count} new users migrated/registered. ---\n")
+        return migrated_count
+        
+    except Exception as e:
+        print(f"An error occurred during migration: {e}")
+        return 0
