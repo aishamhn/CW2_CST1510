@@ -1,24 +1,19 @@
-from app.data.db import connect_database
+from app.data.db import execute_query
 
-def get_user_by_username(username):
-    """Retrieve user by username."""
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT * FROM users WHERE username = ?",
-        (username,)
-    )
-    user = cursor.fetchone()
-    conn.close()
-    return user
+def insert_user(conn, username, hashed_password, role):
+    """
+    Inserts a new user into the 'users' table.
+    """
+    sql = "INSERT INTO users (username, hashed_password, role) VALUES (?, ?, ?)"
+    #hashed_password is stored as a string, must decode from bytes if needed
+    params = (username, hashed_password.decode('utf-8'), role)
+    return execute_query(conn, sql, params=params, commit=True)
 
-def insert_user(username, password_hash, role='user'):
-    """Insert new user."""
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-        (username, password_hash, role)
-    )
-    conn.commit()
-    conn.close()
+
+def get_user_by_username(conn, username):
+    """
+    Retrieves a user record by username.
+    """
+    sql = "SELECT username, hashed_password, role FROM users WHERE username = ?"
+    params = (username)
+    return execute_query(conn, sql, params=params, commit=True)
