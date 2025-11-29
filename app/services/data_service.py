@@ -17,7 +17,7 @@ def load_csv_to_table(conn, csv_filename, table_name):
         df.to_sql(
             name=table_name,
             con=conn,
-            if_exists='append', #'append' adds new data. 'replace' deletes old data
+            if_exists='append', #'append' adds new data.
             index=False # Do not write the DataFrame's index column
         )
         print(f"Successfully loaded {len(df)} rows from '{csv_filename}' into '{table_name}'.")
