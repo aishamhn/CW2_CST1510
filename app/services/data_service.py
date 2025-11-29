@@ -1,15 +1,12 @@
 import pandas as pd
 from app.data.db import connect_database
-from app.data.db import DB_PATH #Import DB_PATH for utility functions
+from app.data.db import DB_PATH
 
 def load_csv_to_table(conn, csv_filename, table_name):
     """
-    Loads data from a CSV file into the specified database table.
-
-    :param conn: The database connection object.
-    :param csv_filename: The name of the CSV file in the DATA directory.
-    :param table_name: The target table name in the database.
+    Loads data from a CSV file into the specified database table using pandas.
     """
+    #Assumes CSVs are in the DATA directory sibling to the database file
     csv_path = DB_PATH.parent / csv_filename
 
     try:
@@ -26,6 +23,6 @@ def load_csv_to_table(conn, csv_filename, table_name):
         print(f"Successfully loaded {len(df)} rows from '{csv_filename}' into '{table_name}'.")
 
     except FileNotFoundError:
-        print(f"Error: CSV file not found at '{csv_path}'.")
+        print(f"Error: CSV file not found at '{csv_path}'. Ensure it's in the DATA/ directory")
     except Exception as e:
         print(f"Error loading data into {table_name}: {e}")
