@@ -1,6 +1,6 @@
 from app.data.db import execute_query
 
-#users table
+# --- USERS TABLE ---
 def create_users_table(conn):
     """Creates the 'users' table for authentication."""
     sql = """
@@ -11,9 +11,9 @@ def create_users_table(conn):
     );
     """
     execute_query(conn, sql, commit=True)
-    print("Table 'users' created.")
+    print("✅ Table 'users' created.")
 
-#domain tables
+# --- DOMAIN TABLES (Based on CSV Headers) ---
 def create_cyber_incidents_table(conn):
     """Creates the 'cyber_incidents' table."""
     sql = """
@@ -27,7 +27,7 @@ def create_cyber_incidents_table(conn):
     );
     """
     execute_query(conn, sql, commit=True)
-    print("Table 'cyber_incidents' created.")
+    print("✅ Table 'cyber_incidents' created.")
 
 
 def create_datasets_metadata_table(conn):
@@ -43,7 +43,7 @@ def create_datasets_metadata_table(conn):
     );
     """
     execute_query(conn, sql, commit=True)
-    print("Table 'datasets_metadata' created.")
+    print("✅ Table 'datasets_metadata' created.")
 
 
 def create_it_tickets_table(conn):
@@ -60,7 +60,7 @@ def create_it_tickets_table(conn):
     );
     """
     execute_query(conn, sql, commit=True)
-    print("Table 'it_tickets' created.")
+    print("✅ Table 'it_tickets' created.")
 
 
 def create_all_tables(conn):
