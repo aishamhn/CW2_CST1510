@@ -108,3 +108,57 @@ def interactive_menu(conn):
             break
         else:
             print("Invalid choice. Please try again.")
+
+def run_comprehensive_tests(conn):
+    """
+    Runs a test sequence for CRUD operations on cyber_incidents.
+    """
+    print("\n--- DEMO: CRUD Operations on Cyber Incidents ---")
+
+    # CREATE (Insert)
+    incident_id = insert_incident(
+        conn, "2025-11-20 09:00:00:000000", "Critical", "Zero-Day Exploit", "Open", "A critical new incident created via the application."
+    )
+    if incident_id:
+        print(f"New incident created with ID: {incident_id}")
+    
+    #READ ALL
+    all_incidents = get_all_incidents(conn)
+    print(f"Total Incidents after insert: {len(all_incidents)} records.")
+
+    # READ by ID
+    new_incident = get_incident_by_id(conn, incident_id)
+    print(f"New Incident data (Status): {new_incident[4]}")
+
+    #UPDATE
+    update_incident_status(conn, incident_id, "In Progress")
+    updated_incident = get_incident_by_id(conn, incident_id)
+    print(f"Incident ID {incident_id} Status updated to: {updated_incident[4]}")
+
+    #ANALYTICAL READ
+    stats = get_incident_stats_by_severity(conn)
+    print(f"Incidents by Severity (Top 3): {stats[:3]}")
+
+    #DELETE
+    delete_incident(conn, incident_id)
+    deleted_incident = get_incident_by_id(conn, incident_id)
+    print(f"Incident ID {incident_id} after deletion: {deleted_incident}")
+
+    #Other Reads
+    datasets = get_all_datasets_metadata(conn)
+    print(f"Dataset Metadata loaded: {len(datasets)} records.")
+    tickets = get_all_it_tickets(conn)
+    print(f"IT Tickets loaded: {len(tickets)} records.")
+
+    print("\n--- DEMO COMPLETE ---")
+    
+
+if __name__ == '__main__':
+    # 1. connect to the database
+    conn = connect_database()
+
+    # 2. Start the interactive menu
+    interactive_menu(conn)
+
+    # 3. close the connection
+    conn.close() 
