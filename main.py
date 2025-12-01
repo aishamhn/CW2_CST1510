@@ -1,61 +1,110 @@
-from app.data.db import connect_database
-from app.data.incidents import insert_incident, get_all_incidents
+from app.data.db import connect_database, DATA_DIR
 from app.data.schema import create_all_tables
-from app.services.user_service import migrate_users_from_file, register_user, login_user
+from app.services.user_service import register_user, login_user, migrate_users_from_file
+from app.services.data_service import load_csv_to_table
+from app.data.incidents import (
+    insert_incident, get_all_incidents,
+    update_incident_status, delete_incident,
+    get_incident_by_id, get_incident_stats_by_severity
+)
+#assuming other CRUD/Read functions exist in other files
+from app.data.datasets import get_all_datasets_metadata
+from app.data.tickets import get_all_it_tickets
+from pathlib import Path
+import getpass #For securely reading the password
 
-def setup_database_complete():
+def setup_database(conn):
     """
-    Complete database setup:
-    1. Connect to database
-    2. Create all tables
-    3. Migrate users from users.txt
-    4. Load CSV data for all domains
-    5. Verify setup
+    Sets up the entire database: create tables, registers core users, and loads CSV data.
     """
-    print("\n" + "="*60)
-    print("STARTING COMPLETE DATABASE SETUP")
-    print("="*60)
-    
-    # Step 1: Connect
-    print("\n[1/5] Connecting to database...")
-    conn = connect_database()
-    print("       Connected")
-    
-    # Step 2: Create tables
-    print("\n[2/5] Creating database tables...")
+    print("--- Database Setup Started ---")
+
+    #1. Create all tables
     create_all_tables(conn)
-    
-    # Step 3: Migrate users
-    print("\n[3/5] Migrating users from users.txt...")
-    user_count = migrate_users_from_file(conn)
-    print(f"       Migrated {user_count} users")
-    
-    # Step 4: Load CSV data
-    print("\n[4/5] Loading CSV data...")
-    total_rows = load_all_csv_data(conn)
-    
-    # Step 5: Verify
-    print("\n[5/5] Verifying database setup...")
-    cursor = conn.cursor()
-    
-    # Count rows in each table
-    tables = ['users', 'cyber_incidents', 'datasets_metadata', 'it_tickets']
-    print("\n Database Summary:")
-    print(f"{'Table':<25} {'Row Count':<15}")
-    print("-" * 40)
-    
-    for table in tables:
-        cursor.execute(f"SELECT COUNT(*) FROM {table}")
-        count = cursor.fetchone()[0]
-        print(f"{table:<25} {count:<15}")
-    
-    conn.close()
-    
-    print("\n" + "="*60)
-    print(" DATABASE SETUP COMPLETE!")
-    print("="*60)
-    print(f"\n Database location: {DB_PATH.resolve()}")
-    print("\nYou're ready for Week 9 (Streamlit web interface)!")
 
-# Run the complete setup
-setup_database_complete()
+    #2. Prepare users.txt for migration (if it doesn't exist)
+    placeholder_users_path = DATA_DIR / "users.txt"
+    if not placeholder_users_path.exists():
+        with open(placeholder_users_path, 'w') as f:
+            f.write("admin,cyber_admin\n")
+            f.write("analyst,data_analyst\n")
+    
+    #3. Migrate/Register Users
+    migrate_users_from_file(conn)
+
+    #4 Load CSV Data
+    print("\n--- Loading Domain Data ---")
+    load_csv_to_table(conn, "cyber_incidents.csv", "cyber_incidents")
+    load_csv_to_table(conn, "datasets_metadata.csv", "datasets_metadata")
+    load_csv_to_table(conn, "it_tickets.csv", "it_tickets")
+    print("---------------------------\n")
+
+    # --- INTERACTIVE USER FUNCTIONS ---
+
+def interactive_register(conn):
+    """Prompts user for registration details."""
+    print("\n-- Register New User --")
+    username = input("Enter desired username: ")
+    #use getpass to hide the password input
+    password = getpass.getpass("Enter password: ")
+    role = input("Enter role (e.g., analyst, admin): ")
+
+    #call the core service function
+    register_user(conn, username, password, role)
+
+def interactive_login(conn):
+    """Prompts user for login details and attempts authentication."""
+    print("\n-- User login--")
+    username = input("Enter username: ")
+    password = getpass.getpass("Enter password: ")
+
+    #call the core service function
+    role = login_user(conn, username, password)
+
+    if role:
+        print(f"Login successful! Welcome, {username} ({role})")
+        return role
+    else:
+        print("Login failed: Invalid username or password.")
+        return None
+
+
+def interactive_menu(conn):
+    """Main interactive loop for testing authentication."""
+    setup_database(conn)
+
+    current_role = None
+
+    while True:
+        print("\n====================================")
+        print("         MAIN MENU (SQL LAB)         ")
+        print("====================================")
+        if current_role:
+            print(f"Logged in as: {current_role}")
+            print("1. Logout")
+            print("2. Test CRUD operations (Demo)")
+            print("3. Exit application")
+        else:
+            print("1. Register New user")
+            print("2. Login")
+            print("3. Exit Application")
+
+        choice = input("Enter choice (1-3): ")
+
+        if choice == "1":
+            if current_role:
+                current_role = None
+                print("Logged out successfully.")
+            else:
+                interactive_register(conn)
+        elif choice == "2":
+            if current_role:
+                # user is logged in, run demo
+                run_comprehensive_tests(conn)
+            else:
+                current_role = interactive_login(conn)
+        elif choice == "3":
+            print("Exiting application. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
