@@ -30,7 +30,7 @@ if incident_data:
     stats = get_incident_stats_by_severity(CONN)
     if stats:
         df_stats = pd.DataFrame(stats, columns=["Severity", "Count"])
-        st.bar_chaty(df_stats, x="Severity", y="Count")
+        st.bar_chart(df_stats, x="Severity", y="Count")
     
 else:
     st.info("No cyber incident data available.")
