@@ -10,7 +10,7 @@ def register_user(conn, username, password, role):
     Hashes the password and registers a new user if the username is not taken.
     """
     if get_user_by_username(conn, username):
-        print(f"❌ Registration failed: User '{username}' already exists.")
+        print(f"Registration failed: User '{username}' already exists.")
         return False
 
     # Hash the password using bcrypt
@@ -45,7 +45,7 @@ def migrate_users_from_file(conn, filepath=USERS_FILE_PATH):
     """
     try:
         if not filepath.exists():
-             print(f"⚠️ Migration skipped: User file '{filepath}' not found.")
+             print(f"Migration skipped: User file '{filepath}' not found.")
              return 0
 
         with open(filepath, 'r') as f:
@@ -68,5 +68,5 @@ def migrate_users_from_file(conn, filepath=USERS_FILE_PATH):
         return migrated_count
         
     except Exception as e:
-        print(f"❌ An error occurred during migration: {e}")
+        print(f"An error occurred during migration: {e}")
         return 0

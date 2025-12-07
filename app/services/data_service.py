@@ -20,9 +20,9 @@ def load_csv_to_table(conn, csv_filename, table_name):
             if_exists='append', 
             index=False         
         )
-        print(f"✅ Successfully loaded {len(df)} rows from '{csv_filename}' into table '{table_name}'.")
+        print(f"Successfully loaded {len(df)} rows from '{csv_filename}' into table '{table_name}'.")
     
     except FileNotFoundError:
-        print(f"❌ Error: CSV file not found at '{csv_path}'. Ensure it's in the DATA/ directory.")
+        print(f"Error: CSV file not found at '{csv_path}'. Ensure it's in the DATA/ directory.")
     except Exception as e:
-        print(f"❌ Error loading data into {table_name}: {e}")
+        print(f"Error loading data into {table_name}: {e}")
