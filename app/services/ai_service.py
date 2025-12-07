@@ -2,7 +2,7 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-GEMINI_KEY = "AIzaSyBS2TKSf0jCCEYiSxtBMjoRNF2u9cCOzco"
+GEMINI_KEY = ""
 
 #initialize the Gemini Client
 try:
