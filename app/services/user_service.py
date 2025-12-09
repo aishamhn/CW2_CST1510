@@ -18,7 +18,7 @@ def register_user(conn, username, password, role):
     
     # Insert the user into the database
     insert_user(conn, username, hashed_password, role)
-    print(f"✅ User '{username}' registered successfully with role '{role}'.")
+    print(f"User '{username}' registered successfully with role '{role}'.")
     return True
 
 def login_user(conn, username, password):
