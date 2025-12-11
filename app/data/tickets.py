@@ -5,7 +5,7 @@ def get_all_it_tickets(conn):
     sql = "SELECT ticket_id, priority, description, status, assigned_to, created_at FROM it_tickets ORDER BY created_at DESC"
     return execute_query(conn, sql, fetch_one=False)
 
-def get_ticket_status_by_priority(conn):
+def get_ticket_stats_by_priority(conn):
     """
     Retrieves ticket counts grouped by priority, ordered by severity.
     """
