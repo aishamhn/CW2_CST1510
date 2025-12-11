@@ -1,0 +1,5 @@
+# Streamlit Secrets
+.streamlit/secrets.toml
+
+# Database Files
+DATA/intelligence_platform.db

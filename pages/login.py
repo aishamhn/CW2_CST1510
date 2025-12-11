@@ -9,7 +9,7 @@ st.header("User Login")
 
 if st.session_state.get('logged_in', False):
     st.success(f"You are already logged in as {st.session_state['username']}.")
-    st.page_link("pages/dashboard.py", label="Go to Dashboard", icon="📊")
+    st.page_link("pages/dashboard.py", label="Go to Dashboard")
 else:
     with st.form("login_form"):
         username = st.text_input("Username")

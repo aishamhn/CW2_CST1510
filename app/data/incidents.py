@@ -15,10 +15,9 @@ def insert_incident(conn, timestamp, severity, category, status, description):
 # READ
 def get_all_incidents(conn):
     """
-    Retrieves all records from the cyber_incidents table.
+    Retrieves all records from the cyber_incidents table with explicit columns.
     """
-    sql = "SELECT * FROM cyber_incidents;"
-    # execute_query returns all results by default
+    sql = "SELECT incident_id, timestamp, severity, category, status, description FROM cyber_incidents ORDER BY timestamp DESC"
     return execute_query(conn, sql)
 
 def get_incident_by_id(conn, incident_id):
@@ -36,7 +35,14 @@ def update_incident_status(conn, incident_id, new_status):
     """
     sql = "UPDATE cyber_incidents SET status = ? WHERE incident_id = ?;"
     params = (new_status, incident_id)
-    # execute_query returns None, but commits the change
+    execute_query(conn, sql, params=params, commit=True)
+    
+def update_incident_severity(conn, incident_id, new_severity):
+    """
+    Updates the severity of a specific cyber incident.
+    """
+    sql = "UPDATE cyber_incidents SET severity = ? WHERE incident_id = ?;"
+    params = (new_severity, incident_id)
     execute_query(conn, sql, params=params, commit=True)
 
 # DELETE
@@ -48,15 +54,20 @@ def delete_incident(conn, incident_id):
     params = (incident_id,)
     execute_query(conn, sql, params=params, commit=True)
 
-# ANALYTICAL READ (Example)
+# ANALYTICAL READ
 def get_incident_stats_by_severity(conn):
     """
-    Returns the count of incidents grouped by severity.
+    Returns the count of incidents grouped by severity, ordered by risk level.
     """
     sql = """
-    SELECT severity, COUNT(*) 
+    SELECT severity, COUNT(incident_id) as count
     FROM cyber_incidents 
     GROUP BY severity 
-    ORDER BY COUNT(*) DESC;
+    ORDER BY CASE severity
+        WHEN 'Critical' THEN 1
+        WHEN 'High' THEN 2
+        WHEN 'Medium' THEN 3
+        WHEN 'Low' THEN 4
+    END
     """
     return execute_query(conn, sql)
