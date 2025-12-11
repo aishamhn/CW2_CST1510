@@ -1,2 +1,5 @@
 bcrypt==4.2.0
 Python 3.8 or higher installed
+streamlit
+google-genai
+pandas
