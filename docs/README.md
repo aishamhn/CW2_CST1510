@@ -35,7 +35,7 @@ This system allows users to register accounts and log in with proper password
 
 **Implementation Tasks:**
 1. **Database Manager:** Create a DatabaseManager class to handle SQLite connection and cursor operations.
-2. **Schema Design:** Create the users table and the tables for **ALL THREE** domains.
+2. **Schema Design:** Create the users table and the tables for the domains.
 3. **Data Migration:** Write a script to read data from `users.txt` and insert it into the new SQLite `users` table.
 4. **CRUD Implementation:** Implement all four CRUD operations (Create, Read, Update, Delete) for **ALL THREE** domain tables.
 5. **Data Loading:** Use pandas to read the provided sample data (e.g., `cyber_incidents.csv`) and load it into the respective SQLite tables.
