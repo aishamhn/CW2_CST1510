@@ -9,7 +9,6 @@ from app.services.data_service import load_csv_to_table
 def initialize_datatbase():
     """ Connects to DB and performs initial setup only once."""
     conn = connect_database()
-    st.info("Database connection established. Setting up tables...")
     create_all_tables(conn)
 
     #run migration before loading data (so users are present)
@@ -20,7 +19,6 @@ def initialize_datatbase():
     load_csv_to_table(conn, "datasets_metadata.csv", "datasets_metadata")
     load_csv_to_table(conn, "it_tickets.csv", "it_tickets")
 
-    st.success("Database fully initialized and data loaded")
     return conn
 
 #Global connection object
@@ -34,7 +32,7 @@ if 'username' not in st.session_state:
 if 'role' not in st.session_state:
     st.session_state['role'] = None
 
-#Mian app entry point
+#Main app entry point
 st.set_page_config(
     page_title="Intelligence Platform",
     page_icon="🌐",
