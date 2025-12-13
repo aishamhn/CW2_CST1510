@@ -112,7 +112,7 @@ with tab_cyber:
         st.markdown("#### Raw Incident Data")
         #Full Data Table
         columns = ["ID", "Timestamp", "Severity", "Category", "Status", "Description"]
-        df_incidents = pd.DataFrames(incident_data, columns=columns)
+        df_incidents = pd.DataFrame(incident_data, columns=columns)
         st.dataframe(df_incidents, use_container_width=True)
     else:
         st.info("No cyber incident data available.")
@@ -142,7 +142,7 @@ with tab_it:
         st.markdown("#### Critical Open Tickets")
         if critical_open_tickets:
             df_critical = pd.DataFrame(critical_open_tickets, columns=["ID", "Priority", "Description", "Assigned To"])
-            st.dataFrame(df_critical, use_container_width=True)
+            st.dataframe(df_critical, use_container_width=True)
         else:
             st.info("No critical open tickets found.")
 
