@@ -31,7 +31,7 @@ This system allows users to register accounts and log in with proper password
 ### Week 8: Data Pipeline & CRUD (SQL)
 
 **Theoretical Focus:** Relational Databases & SQL: Introduction to SQLite. Database schema design. Full CRUD operations and parameterized queries (SQL Injection prevention).
-**Practical Focus:** Database Migration & CRUD for All Domains
+**Practical Focus:** Database Migration & CRUD
 
 **Implementation Tasks:**
 1. **Database Manager:** Create a DatabaseManager class to handle SQLite connection and cursor operations.
@@ -40,13 +40,13 @@ This system allows users to register accounts and log in with proper password
 4. **CRUD Implementation:** Implement all four CRUD operations (Create, Read, Update, Delete) for **ALL THREE** domain tables.
 5. **Data Loading:** Use pandas to read the provided sample data (e.g., `cyber_incidents.csv`) and load it into the respective SQLite tables.
 
-**GitHub Deliverable:** A command-line script that uses the SQLite database for all user and domain data. Full CRUD functionality demonstrated via the command line for all three domains.
+**GitHub Deliverable:** A command-line script that uses the SQLite database for all user and domain data. Full CRUD functionality demonstrated via the command line.
 
 ---
 
 ### Week 9: Web Interface, MVC & Visualization
 
-**Theoretical Focus:** Web Application Architecture: Streamlit fundamentals, session state management, multi-page apps. Data Visualization with Plotly/Matplotlib and embedding charts in Streamlit.
+**Theoretical Focus:** Web Application Architecture: Streamlit fundamentals, session state management, multi-page apps. Data Visualization and embedding charts in Streamlit.
 **Practical Focus:** Streamlit Conversion & Master One Domain
 
 **Implementation Tasks:**
@@ -69,4 +69,4 @@ This system allows users to register accounts and log in with proper password
 2. **AI Integration:** Set up the API key using **Streamlit Secrets**. Create a helper function (`ai_service.py`) to call the Gemini API.
 3. **AI Assistant:** Integrate the AI Assistant feature into its own dedicated chat page (`ai_chat.py`) to provide security advice or statistical explanations.
 
-**GitHub Deliverable:** A complete, fully functional Multi-Domain Intelligence Platform that meets all mandatory requirements (Authentication, DB, CRUD for all domains, All Visualizations, AI).
+**GitHub Deliverable:** A complete, fully functional Multi-Domain Intelligence Platform that meets all mandatory requirements.
