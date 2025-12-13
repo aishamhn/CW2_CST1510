@@ -30,7 +30,7 @@ This system allows users to register accounts and log in with proper password
 
 ### Week 8: Data Pipeline & CRUD (SQL)
 
-**Theoretical Focus:** Relational Databases & SQL: Introduction to SQLite. Database schema design (Normalization). Full CRUD operations and parameterized queries (SQL Injection prevention).
+**Theoretical Focus:** Relational Databases & SQL: Introduction to SQLite. Database schema design. Full CRUD operations and parameterized queries (SQL Injection prevention).
 **Practical Focus:** Database Migration & CRUD for All Domains
 
 **Implementation Tasks:**
@@ -61,7 +61,7 @@ This system allows users to register accounts and log in with proper password
 
 ### Week 10: Final Dashboards & AI Integration
 
-**Theoretical Focus:** API Integration: REST APIs, API keys, Environment Variables. Introduction to the Gemini API and context-aware prompting.
+**Theoretical Focus:** API Integration: API keys, Environment Variables. Introduction to the Gemini API and context-aware prompting.
 **Practical Focus:** Complete Remaining Dashboards & Integrate AI
 
 **Implementation Tasks:**
@@ -70,17 +70,3 @@ This system allows users to register accounts and log in with proper password
 3. **AI Assistant:** Integrate the AI Assistant feature into its own dedicated chat page (`ai_chat.py`) to provide security advice or statistical explanations.
 
 **GitHub Deliverable:** A complete, fully functional Multi-Domain Intelligence Platform that meets all mandatory requirements (Authentication, DB, CRUD for all domains, All Visualizations, AI).
-
----
-
-### Week 11: Software Architecture & Polish
-
-**Theoretical Focus:** Software Refactoring: Benefits of OOP. Review of class design, constructors, methods, and attributes. Final project documentation and submission requirements.
-**Practical Focus:** OOP Refactoring & Final Documentation
-
-**Implementation Tasks:**
-1. **Refactoring:** Refactor the procedural code from Weeks 7-10 to use a clean, maintainable structure (e.g., Service and Data Access Layers).
-2. **Documentation:** Write the final `README.md` and ensure all code has clear comments and docstrings.
-3. **Report Preparation:** Finalize the required diagrams and draft the technical report.
-
-**GitHub Deliverable:** The final project code, fully refactored and documented, ready for submission.
